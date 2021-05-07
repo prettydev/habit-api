@@ -52,13 +52,22 @@ async function getById(id) {
 
 async function create(params) {
   // validate
+
+  console.log("params:", params);
+
   const email = params.email;
   const uniqueString = randString();
   const isValid = false;
-  if (await db.User.findOne({ where: { email } })) {
-    throw 'Email "' + params.email + '" is already taken';
-  }
+  
+    const _user = await db.User.findOne({ where: { email } });
 
+    console.log("old user:", _user);
+
+    if (_user) {
+      console.log('Email "' + params.email + '" is already taken');
+      return {code:'error', message:'Email "' + params.email + '" is already taken'};
+    }  
+  
   // hash password
   if (params.password) {
     params.password = await bcrypt.hash(params.password, 10);
@@ -66,8 +75,16 @@ async function create(params) {
   // save user
   params.uniqueString = uniqueString;
   params.isValid = isValid;
+
+  console.log("before creating new user:", params);
+
   const newUser = await db.User.create(params);
+
+  console.log("new user:", newUser);
+
   sendEmail(email, uniqueString);
+
+  return { code:'success', message: 'Registration successful' }
 }
 
 async function update(id, params) {
@@ -139,17 +156,17 @@ async function sendEmail(email, uniqueString) {
   });
 
   var mailOptions;
-  let sender = "your name";
+  let sender = "Habio";
   mailOptions = {
     from: sender,
     to: email,
     subject: "Emial confirmation",
-    html: `Press <a href="http://localhost:4000/users/verify/${uniqueString}">here </a> to verify your email`,
+    html: `Press <a href="http://108.61.172.48/users/verify/${uniqueString}">here </a> to verify your email`,
   };
 
   Transport.sendMail(mailOptions, function (error, response) {
     if (error) {
-      console.log(error);
+      console.log("Message Error:", error);
     } else {
       console.log("Message sent");
     }

@@ -47,17 +47,16 @@ function authenticate(req, res, next) {
 
 function registerSchema(req, res, next) {
     const schema = Joi.object({
-        displayName: Joi.string().required(),
+        // displayName: Joi.string().required(),
         password: Joi.string().min(6).required(),
         email: Joi.string().required(),
     });
     validateRequest(req, next, schema);
 }
 
-function register(req, res, next) {
-    userService.create(req.body)
-        .then(() => res.json({ message: 'Registration successful' }))
-        .catch(next);
+async function register(req, res, next) {
+    const result = await userService.create(req.body)
+    return res.json(result);
 }
 
 function getAll(req, res, next) {

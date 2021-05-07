@@ -33,7 +33,7 @@ function createSchema(req, res, next) {
 function create(req, res, next) {
     console.log(req);
     userHabitService.create(req.user.id, req.body)
-        .then(() => res.json({ message: 'Registration successful' }))
+        .then(() => res.json({ code:'success', message: 'Registration successful' }))
         .catch(next);
 }
 

@@ -21,7 +21,7 @@ function createSchema(req, res, next) {
 
 function create(req, res, next) {
     membershipService.create(req.body)
-        .then(() => res.json({ message: 'Registration successful' }))
+        .then(() => res.json({ code:'success', message: 'Registration successful' }))
         .catch(next);
 }
 

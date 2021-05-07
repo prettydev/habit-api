@@ -22,8 +22,8 @@ function createSchema(req, res, next) {
 }
 
 function create(req, res, next) {
-    trackingService.create(req.user.id, req.body)
-        .then(() => res.json({ message: 'Registration successful' }))
+    trackingService.create(req.user.id, req.body)        
+        .then(() => res.json({ code:'success', message: 'Registration successful' }))
         .catch(next);
 }
 
