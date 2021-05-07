@@ -36,9 +36,10 @@ async function signInWithSocial(params) {
 async function authenticate({ email, password }) {
   const user = await db.User.scope("withHash").findOne({ where: { email } });
 
-  if (!user || !(await bcrypt.compare(password, user.password)))
-    throw "Email or password is incorrect";
-
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    return {code:"error", message:"Email or password is incorrect"}
+  }
+    
   return authSuccessful(user);
 }
 
@@ -96,7 +97,7 @@ async function update(id, params) {
     emailChanged &&
     (await db.User.findOne({ where: { email: params.email } }))
   ) {
-    throw 'email "' + params.email + '" is already taken';
+    return {code:"error", message:'email "' + params.email + '" is already taken'};
   }
 
   // hash password if it was entered
@@ -133,7 +134,7 @@ function authSuccessful(user) {
   // authentication successful
   const token =
     "Bearer " + jwt.sign({ sub: user.id }, config.secret, { expiresIn: "7d" });
-  return { ...omitHash(user.get()), token };
+  return { code:"success", data:{...omitHash(user.get()), token} };
 }
 
 const randString = () => {
@@ -147,6 +148,9 @@ const randString = () => {
 };
 
 async function sendEmail(email, uniqueString) {
+
+  console.log("mail, pass:", process.env.EMAIL, process.env.PASSWORD);
+
   var Transport = nodemailer.createTransport({
     service: "Gmail",
     auth: {
@@ -174,12 +178,12 @@ async function sendEmail(email, uniqueString) {
 }
 
 async function verify(params) {
-  const { uniqueString } = params;
-  user = await db.User.findOne({ uniqueString });
+  let user = await db.User.findOne({where:{uniqueString:params.uniqueString }});
   if (user) {
     user.isValid = true;
     await user.save();
+    return "Success!"
   } else {
-    throw "User not found";
+    return "User not found";
   }
 }

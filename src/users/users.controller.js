@@ -25,9 +25,9 @@ function signInWithSocial(req, res, next) {
         .catch(next);
 }
 
-function verify(req, res, next) {
-    userService.verify(req.params)
-            .then(user => res.json(user));
+async function verify(req, res, next) {
+    const result = await userService.verify(req.params);
+    return res.send(result)
 }
 
 function authenticateSchema(req, res, next) {
@@ -39,10 +39,9 @@ function authenticateSchema(req, res, next) {
     validateRequest(req, next, schema);
 }
 
-function authenticate(req, res, next) {
-    userService.authenticate(req.body)
-        .then(user => res.json(user))
-        .then(console.log(req.body));
+async function authenticate(req, res, next) {
+    const result = await userService.authenticate(req.body)
+    return res.json(result);
 }
 
 function registerSchema(req, res, next) {
