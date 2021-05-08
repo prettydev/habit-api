@@ -39,6 +39,10 @@ async function authenticate({ email, password }) {
   if (!user || !(await bcrypt.compare(password, user.password))) {
     return {code:"error", message:"Email or password is incorrect"}
   }
+
+  if (!user.isValid) {
+    return {code:"error", message:"Please check your email and verify an account!"}
+  }
     
   return authSuccessful(user);
 }
